@@ -65,10 +65,7 @@ skin_r[which(skin_r$Target=="1"),"Target"]<-"0"
 skin_r[which(skin_r$Target=="2"),"Target"]<-"1"
 skin_r$Target<-as.factor(skin_r$Target)
 
-skin_r$Target<-as.character(skin_r$Target)
-skin_r[which(skin_r$Target=="1"),"Target"]<-"0"
-skin_r[which(skin_r$Target=="2"),"Target"]<-"1"
-skin_r$Target<-as.factor(skin_r$Target)
+
 
 
 #Splitting Train And Test
@@ -98,6 +95,7 @@ auc_score<-perfauc@y.values[[1]]
 pred_test<-predict(model_log,test1,type="response")
 pred_test1<-ifelse(pred_test>=0.7,"1","0")
 log_conf<-confusionMatrix(pred_test1,test1$Target)
+levels(pred_test1)
 
 #Logistic Regression with Cross Validation
 
@@ -134,6 +132,7 @@ log_conf111<-confusionMatrix(pred_test11,test1$Target)
 
 #Models_Decision Trees
 model_rpart<-rpart(Target~.,data = train1)
+head(train1)
 pre_rpart<-predict(model_rpart,test1,type="class")
 
 rpart_conf<-confusionMatrix(pre_rpart,test1$Target)
@@ -167,10 +166,46 @@ model_svm<-svm(Target~.,data=train1)
 pre_svm<-predict(model_svm,test1,type="class")
 svm_conf<-confusionMatrix(pre_svm,test1$Target)
 
+
+model_sv1m<-svm(Target~.,data=train1)
+pre_svm1<-predict(model_sv1m,test1,type="class")
+svm_conf1<-confusionMatrix(pre_svm1,test1$Target)
+
+model_svm2<-svm(Target~.,data=train1)
+pre_svm2<-predict(model_svm2,test1,type="class")
+svm_conf2<-confusionMatrix(pre_svm2,test1$Target)
+
+
+
 #Random Forest
 model_rf<-randomForest(Target~.,data = train1)
 pre_rf<-predict(model_rf,test1)
 rf_conf<-confusionMatrix(pre_rf,test1$Target)
+
+model_rf1<-randomForest(Target~.,data = train1,ntrees=300,mtry=2)
+pre_rf1<-predict(model_rf1,test1)
+rf_conf1<-confusionMatrix(pre_rf1,test1$Target)
+
+model_rf2<-randomForest(Target~.,data = train1,ntrees=200,mtry=2)
+pre_rf2<-predict(model_rf2,test1)
+rf_conf2<-confusionMatrix(pre_rf2,test1$Target)
+
+
+#KNN
+
+train1_wt<-subset(train1,select=-c(Target))
+test1_wt<-subset(test1,select=-c(Target))
+model_knn<-knn(train1_wt,test1_wt,train1$Target,prob = TRUE ,k=1)
+
+
+train1_wt<-subset(train1,select=-c(Target))
+test1_wt<-subset(test1,select=-c(Target))
+model_knn<-knn(train1_wt,test1_wt,train1$Target,prob = TRUE ,k=10)
+
+train1_wt<-subset(train1,select=-c(Target))
+test1_wt<-subset(test1,select=-c(Target))
+model_knn<-knn(train1_wt,test1_wt,train1$Target,prob = TRUE ,k=5)
+
 
 
 
